@@ -1,0 +1,8 @@
+.venv-sticker-convert/
+stickers_output/
+downloads/
+*.zip
+*.log
+__pycache__/
+.DS_Store
+Thumbs.db
