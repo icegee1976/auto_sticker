@@ -29,15 +29,22 @@
       </div>
 
       <div class="segmented" role="tablist" aria-label="來源模式">
-        <button id="modeGrid" class="segment is-active" type="button">AI 網格圖</button>
+        <button id="modeAuto" class="segment is-active" type="button">智慧自動辨識</button>
+        <button id="modeGrid" class="segment" type="button">固定格線裁切</button>
         <button id="modeBatch" class="segment" type="button">單圖批次</button>
       </div>
 
-      <label id="gridDrop" class="drop-zone" for="gridFile">
+      <label id="autoDrop" class="drop-zone" for="gridFile">
         <input id="gridFile" type="file" accept="image/png,image/jpeg,image/webp">
+        <span class="drop-icon" aria-hidden="true">◇</span>
+        <strong>上傳 AI 大圖自動辨識</strong>
+        <small id="sourceHint">用去背底色分界，自動找出每張貼圖</small>
+      </label>
+
+      <label id="gridDrop" class="drop-zone hidden" for="gridFile">
         <span class="drop-icon" aria-hidden="true">↑</span>
-        <strong>上傳網格圖</strong>
-        <small id="sourceHint">6×4、5×4、4×3 或自訂格線</small>
+        <strong>上傳固定網格圖</strong>
+        <small>6×4、5×4、4×3 或自訂格線</small>
       </label>
 
       <label id="batchDrop" class="drop-zone hidden" for="batchFiles">
@@ -47,53 +54,75 @@
         <small>批次縮放、去背與封裝</small>
       </label>
 
-      <div class="field-grid">
+      <div id="autoControls" class="control-stack">
         <label>
-          <span>預設</span>
-          <select id="gridPreset">
-            <option value="6x4">24 張 6×4 AI 網格</option>
-            <option value="5x4">20 張 5×4 AI 網格</option>
-            <option value="4x3">4×3 AI 網格</option>
-            <option value="custom">自訂</option>
-          </select>
+          <span>合併距離 <b id="mergeGapLabel">12px</b></span>
+          <input id="mergeGap" type="range" min="0" max="140" value="12">
         </label>
         <label>
-          <span>欄</span>
-          <input id="colsInput" type="number" min="1" max="10" value="5">
+          <span>雜點過濾 <b id="minAreaLabel">0.03%</b></span>
+          <input id="minArea" type="range" min="0" max="0.3" step="0.01" value="0.03">
         </label>
         <label>
-          <span>列</span>
-          <input id="rowsInput" type="number" min="1" max="10" value="4">
+          <span>裁切外擴 <b id="cropMarginLabel">2%</b></span>
+          <input id="cropMargin" type="range" min="0" max="12" step="0.5" value="2">
         </label>
         <label>
-          <span>起始編號</span>
-          <input id="startInput" type="number" min="1" max="99" value="1">
+          <span>邊緣清理 <b id="edgeCleanupLabel">4%</b></span>
+          <input id="edgeCleanup" type="range" min="0" max="20" step="0.5" value="4">
         </label>
       </div>
 
-      <div class="control-stack">
-        <label>
-          <span>格線水平 <b id="offsetXLabel">0%</b></span>
-          <input id="offsetX" type="range" min="-20" max="20" value="0">
-        </label>
-        <label>
-          <span>格線垂直 <b id="offsetYLabel">0%</b></span>
-          <input id="offsetY" type="range" min="-20" max="20" value="0">
-        </label>
-        <label>
-          <span>來源縮放 <b id="scaleLabel">100%</b></span>
-          <input id="sourceScale" type="range" min="80" max="130" value="100">
-        </label>
-        <label>
-          <span>單格內縮 <b id="cellTrimLabel">0%</b></span>
-          <input id="cellTrim" type="range" min="0" max="18" value="0">
-        </label>
+      <div id="gridControls" class="hidden">
+        <div class="field-grid">
+          <label>
+            <span>預設</span>
+            <select id="gridPreset">
+              <option value="6x4">24 張 6×4 AI 網格</option>
+              <option value="5x4">20 張 5×4 AI 網格</option>
+              <option value="4x3">4×3 AI 網格</option>
+              <option value="custom">自訂</option>
+            </select>
+          </label>
+          <label>
+            <span>欄</span>
+            <input id="colsInput" type="number" min="1" max="10" value="5">
+          </label>
+          <label>
+            <span>列</span>
+            <input id="rowsInput" type="number" min="1" max="10" value="4">
+          </label>
+        </div>
+
+        <div class="control-stack">
+          <label>
+            <span>格線水平 <b id="offsetXLabel">0%</b></span>
+            <input id="offsetX" type="range" min="-20" max="20" value="0">
+          </label>
+          <label>
+            <span>格線垂直 <b id="offsetYLabel">0%</b></span>
+            <input id="offsetY" type="range" min="-20" max="20" value="0">
+          </label>
+          <label>
+            <span>來源縮放 <b id="scaleLabel">100%</b></span>
+            <input id="sourceScale" type="range" min="80" max="130" value="100">
+          </label>
+          <label>
+            <span>單格內縮 <b id="cellTrimLabel">0%</b></span>
+            <input id="cellTrim" type="range" min="0" max="18" value="0">
+          </label>
+        </div>
       </div>
+
+      <label>
+        <span>起始編號</span>
+        <input id="startInput" type="number" min="1" max="99" value="1">
+      </label>
 
       <div class="button-row">
         <button id="sliceButton" class="primary-button" type="button">
-          <span aria-hidden="true">✂</span>
-          切割
+          <span aria-hidden="true">◎</span>
+          自動辨識
         </button>
         <button id="resetButton" class="ghost-button" type="button">重設</button>
       </div>
@@ -114,7 +143,7 @@
           <div class="sample-strip" aria-hidden="true">
             <span></span><span></span><span></span><span></span>
           </div>
-          <strong>拖入 AI 貼圖網格或多張 PNG</strong>
+          <strong>拖入 AI 貼圖大圖、固定網格或多張 PNG</strong>
           <small>所有處理都在本機瀏覽器完成</small>
         </div>
       </div>
@@ -123,6 +152,11 @@
         <div class="section-title tight">
           <span class="section-mark">02</span>
           <h2>切片</h2>
+        </div>
+        <div class="piece-actions">
+          <span id="pieceSelectionStatus">未選取切片</span>
+          <button id="mergePiecesButton" class="ghost-button small" type="button" disabled>合併選取</button>
+          <button id="clearSelectionButton" class="ghost-button small" type="button" disabled>清除選取</button>
         </div>
         <div id="pieceGrid" class="thumb-grid"></div>
       </div>
@@ -137,7 +171,8 @@
       <label>
         <span>輸出規格</span>
         <select id="profileSelect">
-          <option value="static">靜態貼圖 370×320</option>
+          <option value="smart">標準貼圖 370×270</option>
+          <option value="static">LINE 最大靜態 370×320</option>
           <option value="animated-frame">動態貼圖單幀 320×270</option>
           <option value="big">大貼圖 396×660</option>
           <option value="custom">自訂尺寸</option>
@@ -151,7 +186,7 @@
         </label>
         <label>
           <span>高</span>
-          <input id="customH" type="number" min="74" max="1000" value="320">
+          <input id="customH" type="number" min="74" max="1000" value="270">
         </label>
       </div>
 
@@ -236,6 +271,7 @@
   <section class="tools-band" aria-label="提示詞與跨平台工具">
     <div class="tool-tabs">
       <button id="promptTab" class="tool-tab is-active" type="button">AI Prompt</button>
+      <button id="metadataTab" class="tool-tab" type="button">Metadata</button>
       <button id="cliTab" class="tool-tab" type="button">sticker-convert</button>
       <button id="specTab" class="tool-tab" type="button">規格摘要</button>
     </div>
@@ -280,6 +316,69 @@
       </div>
     </div>
 
+    <div id="metadataPanel" class="tool-panel hidden">
+      <div class="tool-grid">
+        <div class="panel slim">
+          <label>
+            <span>角色 / 主體</span>
+            <input id="metadataSubject" type="text" placeholder="cute Yorkshire terrier dog">
+          </label>
+          <label>
+            <span>用途主題</span>
+            <select id="metadataTheme">
+              <option value="daily">Daily chat</option>
+              <option value="greetings">Greetings</option>
+              <option value="reactions">Reactions</option>
+              <option value="work">Work chat</option>
+              <option value="pet">Pet lovers</option>
+              <option value="custom">Custom</option>
+            </select>
+          </label>
+          <label>
+            <span>風格</span>
+            <select id="metadataStyle">
+              <option value="cute">Cute sticker set</option>
+              <option value="chibi">Chibi sticker set</option>
+              <option value="3d">3D mascot sticker set</option>
+              <option value="watercolor">Watercolor sticker set</option>
+              <option value="pixel">Pixel sticker set</option>
+            </select>
+          </label>
+          <label>
+            <span>關鍵字補充</span>
+            <input id="metadataKeywords" type="text" placeholder="thank you, apology, encouragement">
+          </label>
+          <div class="button-row compact metadata-buttons">
+            <button id="generateMetadata" class="primary-button" type="button">產生英文文案</button>
+            <button id="downloadContactSheet" class="ghost-button" type="button">下載總覽圖</button>
+          </div>
+        </div>
+        <div class="metadata-output-grid">
+          <div class="metadata-box">
+            <label>
+              <span>Title <b id="metadataTitleCount">0/40</b></span>
+              <input id="metadataTitle" type="text" maxlength="40" spellcheck="false">
+            </label>
+            <label>
+              <span>Description <b id="metadataDescriptionCount">0/160</b></span>
+              <textarea id="metadataDescription" maxlength="160" spellcheck="false"></textarea>
+            </label>
+            <label>
+              <span>Tags</span>
+              <textarea id="metadataTags" spellcheck="false"></textarea>
+            </label>
+            <div class="button-row compact">
+              <button id="copyMetadata" class="ghost-button" type="button">複製 Metadata</button>
+            </div>
+          </div>
+          <div class="prompt-box">
+            <textarea id="metadataVisionPrompt" spellcheck="false"></textarea>
+            <button id="copyVisionPrompt" class="ghost-button copy-button" type="button">複製辨識 Prompt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="cliPanel" class="tool-panel hidden">
       <div class="tool-grid">
         <div class="panel slim">
@@ -315,7 +414,7 @@
         </div>
         <div>
           <h3>AI 網格</h3>
-          <p>支援 6×4、5×4、4×3、自訂欄列；可用角落取樣去除綠幕、白底或黑底，並輸出透明 PNG。</p>
+          <p>預設用背景色自動辨識貼圖數量與位置；整齊圖表仍可切回 6×4、5×4、4×3 或自訂固定格線。</p>
         </div>
         <div>
           <h3>跨平台</h3>
